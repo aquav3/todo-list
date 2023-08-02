@@ -1,9 +1,11 @@
 package tasks
 
 import (
-    "fmt"
-    "os"
-    "encoding/json"
+	"bufio"
+	"encoding/json"
+	"fmt"
+	"os"
+	"strconv"
 )
 
 // Task struct
@@ -38,7 +40,8 @@ func getID(content string) uint64 {
 func Add(tasks *[]Task) {
     var task Task
     fmt.Print("Enter the todo: ")
-    fmt.Scan(&task.Title)
+    reader := bufio.NewReader(os.Stdin)
+    task.Title, _ = reader.ReadString('\n')
     task.ID = uint64(getID(task.Title))
     *tasks = append(*tasks, task)
 }
@@ -56,7 +59,10 @@ func List(tasks *[]Task) {
 func Remove(tasks *[]Task) {
     var UID uint64
     fmt.Print("Enter the UID of the task to remove: ") 
-    fmt.Scan(&UID)
+    reader := bufio.NewReader(os.Stdin)
+    input, _ := reader.ReadString('\n')
+    UID, _ = strconv.ParseUint(input, 10, 64)
+        
     for i, task := range *tasks {
         if UID == task.ID {
             (*tasks)[i] = (*tasks)[len(*tasks)-1]
