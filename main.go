@@ -6,7 +6,6 @@ import (
 )
 
 func printMenu() {
-    fmt.Println("Welcome to todo-list!")
     fmt.Println("1: Create a task")
     fmt.Println("2: List tasks")
     fmt.Println("3: Remove a task")
