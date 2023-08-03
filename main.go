@@ -1,7 +1,14 @@
 package main
 
 import (
+	"bufio"
+	"errors"
 	"fmt"
+	"log"
+	"os"
+	"strconv"
+	"strings"
+
 	"github.com/aquav3/todo-list/tasks"
 )
 
@@ -12,24 +19,54 @@ func printMenu() {
     fmt.Println("4: Exit")
 }
 
+func getInput(prompt string) (string, error) {
+    reader := bufio.NewReader(os.Stdin)
+   
+    fmt.Print(prompt)
+    input, err := reader.ReadString('\n')
+    if err != nil {
+        return "", errors.New("Failed reading user input.")
+    }
+    input = strings.TrimRight(input, "\n")
+
+    return input, nil
+}
+
 func main() {
-    var choice int
-    task := tasks.ReadFromFile()
-    
+    var taskData tasks.Tasks
+    taskData.ReadFromFile("tasks.json")
     AppLoop:
     for {
         printMenu()
-        fmt.Print("Enter option: ")
-        fmt.Scanln(&choice)
+        input, err := getInput("Enter option: ")
+        if err != nil {
+            log.Fatalln("Error: ", err)
+        } 
+        choice, err := strconv.Atoi(input)
         switch choice {
             case 1:
-                tasks.Add(&task)
+                input, err := getInput("Enter task: ")
+                if err != nil {
+                    log.Fatalln("Error: ", err)
+                }
+                taskData.Add(input)
             case 2:
-                tasks.List(&task)
+                taskData.List()
             case 3:
-                tasks.Remove(&task)
+                input, err := getInput("Enter UID: ")
+                if err != nil {
+                    log.Fatalln("Error: ", err)
+                }
+                UID, err := strconv.ParseUint(input, 10, 64)
+                if err != nil {
+                    log.Fatalln("Error: ", err)
+                }
+                taskData.Remove(UID)
             case 4:
-                tasks.WriteToFile(&task)
+                err := taskData.WriteToFile("tasks.json")
+                if err != nil {
+                    log.Fatalln("Error: ", err)
+                }
                 break AppLoop
         }
     }

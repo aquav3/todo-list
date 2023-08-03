@@ -1,34 +1,36 @@
 package tasks
 
 import (
-    "os"
-    "encoding/json"
-    "fmt"
+	"encoding/json"
+	"errors"
+	"os"
 )
 
-func WriteToFile(tasks *[]Task) {
-    file, err := os.Create("tasks.json")
+func (t Tasks) WriteToFile(filename string) error {
+    file, err := os.Create(filename)
     if err != nil {
-        fmt.Println("Failed opening the file: ", err)
-        return
-    } 
-
-    data, err := json.Marshal(*tasks)
+        return errors.New("Failed creating the file to save tasks to.")
+    }
+    data, err := json.Marshal(t.tasks) 
     if err != nil {
-        fmt.Println("Failed encoding json: ", err)
-        return
+        return errors.New("Failed encoding the tasks.")
     }
 
-    file.WriteString(string(data))
+    _, err = file.WriteString(string(data))
+    if err != nil {
+        return errors.New("Failed writing tasks to file.")
+    }
+    return nil
 }
 
-func ReadFromFile() []Task {
-    var data []Task
-    jsonData, _ := os.ReadFile("tasks.json")
-    err := json.Unmarshal(jsonData, &data)
+func (t Tasks) ReadFromFile(filename string) error {
+    jsonData, err := os.ReadFile(filename)
     if err != nil {
-        fmt.Println("Failed decoding JSON: ", err)
+        return errors.New("Failed reading tasks from file.")
     }
-
-    return data
+    err = json.Unmarshal(jsonData, &t.tasks) 
+    if err != nil {
+        return errors.New("Failed decoding tasks from file.") 
+    }
+    return nil
 }
