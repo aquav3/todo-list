@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"strconv"
 	"strings"
@@ -32,6 +33,17 @@ func getInput(prompt string) (string, error) {
     return input, nil
 }
 
+func todo(w http.ResponseWriter, r *http.Request) {
+    
+}
+
+func main() {
+    mux := http.NewServeMux()
+
+    mux.HandleFunc("/todo", todo)
+}
+
+/*
 func main() {
     var taskData tasks.Tasks
     taskData.ReadFromFile("tasks.json")
@@ -71,3 +83,4 @@ func main() {
         }
     }
 }
+*/
